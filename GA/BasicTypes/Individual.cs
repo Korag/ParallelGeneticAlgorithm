@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using GA.Abstracts;
+using GA.Helpers;
 
 namespace GA.BasicTypes
 {
@@ -28,10 +29,23 @@ namespace GA.BasicTypes
 
         public void InsertGenes(int insertIndex, bool[] genes)
         {
-            /////////////////////////////// AsParallel
-            Chromosome.Genes = Chromosome.Genes
-                .Select((x, i) => i < insertIndex ? x : genes[i - insertIndex]).AsParallel()
-                .ToArray();
+            // LINQ
+            //StopwatchProvider.StartStopWatch();
+            //Chromosome.Genes = Chromosome.Genes
+            //    .Select((x, i) => i < insertIndex ? x : genes[i - insertIndex])
+            //    .ToArray();
+            //Console.WriteLine(StopwatchProvider.StopWatchTime());
+
+            // Without LINQ
+            //StopwatchProvider.StartStopWatch();
+            for (int i = 0; i < Chromosome.Genes.Length; i++)
+            {
+                if (i >= insertIndex)
+                {
+                    Chromosome.Genes[i] = genes[i - insertIndex]; 
+                }
+            }
+            //Console.WriteLine(StopwatchProvider.StopWatchTime());
         }
 
         public void ReplaceGenes(bool[] genes)

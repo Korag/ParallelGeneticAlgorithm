@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using GA.Abstracts;
 using GA.BasicTypes;
+using GA.Helpers;
+using GA.Extensions;
 
 namespace GA
 {
@@ -46,11 +48,134 @@ namespace GA
         {
             ResetSimulations();
 
+            // Sekwencyjnie
+            //for (int i = 0; i < maxNumberOfGenerations; i++)
+            //{
+            //    var parents = _selectionOperator.GenerateParentPopulation(_population);
+
+            //    for (int j = 0; j < _numberOfIndividuals - 1; j += 2)
+            //    {
+            //        if (_random.NextDouble() < CrossoverProbability)
+            //        {
+            //            _crossOperator.Crossover(parents[j], parents[j + 1]);
+
+            //            _mutationOperator.Mutation(parents[j], MutationProbability);
+            //            _mutationOperator.Mutation(parents[j + 1], MutationProbability);
+            //        }
+            //    }
+
+            //    _population = parents;
+
+            //    UpdateFitness();
+
+            //    if (PrintStatistics)
+            //    {
+            //        Console.WriteLine($"Generation: {i}");
+            //        Console.WriteLine($"The best is: x = {TakeTheBest().Chromosome.DecodedValue}\tf = {TakeTheBest().Fitness}");
+            //    }
+            //}
+
+            // Parallel z lockiem Randoma
             for (int i = 0; i < maxNumberOfGenerations; i++)
             {
                 var parents = _selectionOperator.GenerateParentPopulation(_population);
 
-                for (int j = 0; j < _numberOfIndividuals - 1; j += 2)
+                Parallel.For(0, _numberOfIndividuals - 1, j =>
+                {
+                    if (_random.NextDoubleLock() < CrossoverProbability)
+                    {
+                        _crossOperator.Crossover(parents[j], parents[j + 1]);
+                        _mutationOperator.Mutation(parents[j], MutationProbability);
+                    }
+
+                    double n = _random.NextDoubleLock();
+                });
+
+                _population = parents;
+
+                UpdateFitness();
+                if (PrintStatistics)
+                {
+                    Console.WriteLine($"Generation: {i}");
+                    Console.WriteLine($"The best is: x = {TakeTheBest().Chromosome.DecodedValue}\tf = {TakeTheBest().Fitness}");
+                }
+            }
+
+            // Parallel bez locka Randoma
+            //for (int i = 0; i < maxNumberOfGenerations; i++)
+            //{
+            //    var parents = _selectionOperator.GenerateParentPopulation(_population);
+
+            //    Parallel.For(0, _numberOfIndividuals - 1, j =>
+            //    {
+            //        if (_random.NextDouble() < CrossoverProbability)
+            //        {
+            //            _crossOperator.Crossover(parents[j], parents[j + 1]);
+            //            _mutationOperator.Mutation(parents[j], MutationProbability);
+            //        }
+            //    });
+
+            //    _population = parents;
+
+            //    UpdateFitness();
+
+            //    if (PrintStatistics)
+            //    {
+            //        Console.WriteLine($"Generation: {i}");
+            //        Console.WriteLine($"The best is: x = {TakeTheBest().Chromosome.DecodedValue}\tf = {TakeTheBest().Fitness}");
+            //    }
+            //}
+
+            // Taski
+            //for (int i = 0; i < maxNumberOfGenerations; i++)
+            //{
+            //    var parents = _selectionOperator.GenerateParentPopulation(_population);
+
+            //    double tasks = (_population.Length / 10000);
+            //    int amountOfTask = (int)Math.Ceiling(tasks);
+            //    Task[] t = new Task[amountOfTask];
+            //    int LeftC = 0;
+            //    int RightC = 1000;
+
+            //    for (int k = 0; k < amountOfTask; k++)
+            //    {
+            //        if (k == amountOfTask - 1)
+            //        {
+            //            RightC = _population.Length - 1;
+            //            t[k] = GeneticOperations(LeftC, RightC, parents);
+            //        }
+            //        else
+            //        {
+            //            t[k] = GeneticOperations(LeftC, RightC, parents);
+            //            LeftC = RightC;
+            //            RightC += 1000;
+            //        }
+            //    }
+
+            //    for (int k = 0; k < amountOfTask; k++)
+            //    {
+            //        t[k].Wait();
+            //    }
+
+            //    _population = parents;
+
+            //    UpdateFitness();
+
+            //    if (PrintStatistics)
+            //    {
+            //        Console.WriteLine($"Generation: {i}");
+            //        Console.WriteLine($"The best is: x = {TakeTheBest().Chromosome.DecodedValue}\tf = {TakeTheBest().Fitness}");
+            //    }
+            //}
+
+            return TakeTheBest();
+        }
+
+        public Task GeneticOperations(int leftC, int rightC, Individual[] parents)
+        {
+            var task = new Task(() =>
+            {
+                for (int j = leftC; j < rightC; j++)
                 {
                     if (_random.NextDouble() < CrossoverProbability)
                     {
@@ -60,44 +185,75 @@ namespace GA
                         _mutationOperator.Mutation(parents[j + 1], MutationProbability);
                     }
                 }
-
-                _population = parents;
-
-                UpdateFitness();
-
-                if (PrintStatistics)
-                {
-                    Console.WriteLine($"Generation: {i}");
-                    Console.WriteLine($"The best is: x = {TakeTheBest().Chromosome.DecodedValue}\tf = {TakeTheBest().Fitness}");
-                }
-            }
-
-            return TakeTheBest();
+            });
+            task.Start();
+            return task;
         }
 
         private Individual TakeTheBest()
         {
-            return _population
-                .OrderByDescending(x => x.Fitness)
-                .FirstOrDefault();
+            // LINQ
+            //StopwatchProvider.StartStopWatch();
+            //Console.WriteLine(_population
+            //    .OrderByDescending(x => x.Fitness)
+            //    .FirstOrDefault() );
+            //Console.WriteLine(StopwatchProvider.StopWatchTime());
+
+            // Without LINQ
+            //StopwatchProvider.StartStopWatch();
+            Individual max = new Individual();
+            max = _population[1];
+            for (int i = 1; i < _population.Length; i++)
+            {
+                if (max.Fitness < _population[i - 1].Fitness)
+                {
+                    max = _population[i - 1];
+                }
+            }
+            //Console.WriteLine(StopwatchProvider.StopWatchTime());
+
+            return max;
         }
 
         private void UpdateFitness()
         {
-            foreach (var individual in _population)
+            //foreach (var individual in _population)
+            //{
+            //    individual.UpdateFitness(_fitnessFunction);
+            //}
+
+            // Parallel
+            Parallel.ForEach(_population, individual =>
             {
                 individual.UpdateFitness(_fitnessFunction);
-            }
+            });
+
         }
 
-        /// ????????? Zmieniamy coœ ?
+
         private void ResetSimulations()
         {
             _population = new Individual[_numberOfIndividuals];
-            for (int i = 0; i < _numberOfIndividuals; i++)
+
+            if (_population.Length < 50000)
             {
-                _population[i] = new Individual(_chromosomeSize);
-                _population[i].UpdateFitness(_fitnessFunction);
+                //StopwatchProvider.StartStopWatch();
+                for (int i = 0; i < _numberOfIndividuals; i++)
+                {
+                    _population[i] = new Individual(_chromosomeSize);
+                    _population[i].UpdateFitness(_fitnessFunction);
+                }
+                //Console.WriteLine(StopwatchProvider.StopWatchTime());
+            }
+            else
+            {
+                //StopwatchProvider.StartStopWatch();
+                Parallel.For(0, _population.Length, i =>
+                {
+                    _population[i] = new Individual(_chromosomeSize);
+                    _population[i].UpdateFitness(_fitnessFunction);
+                });
+                //Console.WriteLine(StopwatchProvider.StopWatchTime());
             }
         }
     }

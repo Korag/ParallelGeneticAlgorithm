@@ -23,10 +23,11 @@ namespace GA.Helpers
             StopWatch.Start();
         }
 
-        public static void DisplayStopWatchTime()
+        public static string StopWatchTime()
         {
-            Console.WriteLine(StopWatch.Elapsed);
-            ClearStopWatch();
+            string time =  StopWatch.Elapsed.ToString();
+            StopWatch.Reset();
+            return time;
         }
 
     }

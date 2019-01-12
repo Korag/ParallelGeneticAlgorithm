@@ -16,16 +16,37 @@ namespace GA.Implementations
 
             //Console.WriteLine($"Cross point: {crossPoint}");
 
-            var parent1Genome = parent1.Chromosome.Genes
-                .SkipWhile((x, i) => i < crossPoint)
-                .ToArray();
+            // LINQ
+            //StopwatchProvider.StartStopWatch();
+            //var parent1Genome = parent1.Chromosome.Genes
+            //    .SkipWhile((x, i) => i < crossPoint)
+            //    .ToArray();
+       
+            //var parent2Genome = parent2.Chromosome.Genes
+            //    .SkipWhile((x, i) => i < crossPoint)
+            //    .ToArray();
+            //Console.WriteLine(StopwatchProvider.StopWatchTime());
 
-            var parent2Genome = parent2.Chromosome.Genes
-                .SkipWhile((x, i) => i < crossPoint)
-                .ToArray();
+            // Without LINQ
+            bool[] parent1Genome2 = new bool[parent1.Chromosome.Genes.Length];
+            bool[] parent2Genome2 = new bool[parent2.Chromosome.Genes.Length];
 
-            parent1.InsertGenes(crossPoint, parent2Genome);
-            parent2.InsertGenes(crossPoint, parent1Genome);
+            //StopwatchProvider.StartStopWatch();
+            int iterator = 0;
+            for (int i = 0; i < parent1.Chromosome.Genes.Length; i++)
+            {
+                if (i >= crossPoint)
+                {
+                    parent1Genome2[iterator] = parent1.Chromosome.Genes[i];
+                    parent2Genome2[iterator] = parent1.Chromosome.Genes[i];
+                    iterator++;
+                }
+            }
+            iterator = 0;
+            //Console.WriteLine(StopwatchProvider.StopWatchTime());
+
+            parent1.InsertGenes(crossPoint, parent2Genome2);
+            parent2.InsertGenes(crossPoint, parent1Genome2);
         }
     }
 }
