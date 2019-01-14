@@ -16,6 +16,7 @@ namespace GA.Extensions
             }
         }
 
+        // Nie potrzebne jezeli jest dodatkowa zmienna Random w Roulette 
         public static double NextDoubleLock(this Random random)
         {
             lock (random)

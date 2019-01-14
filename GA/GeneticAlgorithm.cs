@@ -7,6 +7,7 @@ using GA.Abstracts;
 using GA.BasicTypes;
 using GA.Helpers;
 using GA.Extensions;
+using System.Diagnostics;
 
 namespace GA
 {
@@ -75,20 +76,18 @@ namespace GA
             //    }
             //}
 
-            // Parallel z lockiem Randoma
+            // Parallel
             for (int i = 0; i < maxNumberOfGenerations; i++)
             {
                 var parents = _selectionOperator.GenerateParentPopulation(_population);
 
                 Parallel.For(0, _numberOfIndividuals - 1, j =>
                 {
-                    if (_random.NextDoubleLock() < CrossoverProbability)
+                    if (_random.NextDouble() < CrossoverProbability)
                     {
                         _crossOperator.Crossover(parents[j], parents[j + 1]);
                         _mutationOperator.Mutation(parents[j], MutationProbability);
                     }
-
-                    double n = _random.NextDoubleLock();
                 });
 
                 _population = parents;
@@ -101,30 +100,6 @@ namespace GA
                 }
             }
 
-            // Parallel bez locka Randoma
-            //for (int i = 0; i < maxNumberOfGenerations; i++)
-            //{
-            //    var parents = _selectionOperator.GenerateParentPopulation(_population);
-
-            //    Parallel.For(0, _numberOfIndividuals - 1, j =>
-            //    {
-            //        if (_random.NextDouble() < CrossoverProbability)
-            //        {
-            //            _crossOperator.Crossover(parents[j], parents[j + 1]);
-            //            _mutationOperator.Mutation(parents[j], MutationProbability);
-            //        }
-            //    });
-
-            //    _population = parents;
-
-            //    UpdateFitness();
-
-            //    if (PrintStatistics)
-            //    {
-            //        Console.WriteLine($"Generation: {i}");
-            //        Console.WriteLine($"The best is: x = {TakeTheBest().Chromosome.DecodedValue}\tf = {TakeTheBest().Fitness}");
-            //    }
-            //}
 
             // Taski
             //for (int i = 0; i < maxNumberOfGenerations; i++)
@@ -135,7 +110,7 @@ namespace GA
             //    int amountOfTask = (int)Math.Ceiling(tasks);
             //    Task[] t = new Task[amountOfTask];
             //    int LeftC = 0;
-            //    int RightC = 1000;
+            //    int RightC = 10000;
 
             //    for (int k = 0; k < amountOfTask; k++)
             //    {
@@ -148,7 +123,7 @@ namespace GA
             //        {
             //            t[k] = GeneticOperations(LeftC, RightC, parents);
             //            LeftC = RightC;
-            //            RightC += 1000;
+            //            RightC += 10000;
             //        }
             //    }
 
@@ -217,16 +192,16 @@ namespace GA
 
         private void UpdateFitness()
         {
-            //foreach (var individual in _population)
-            //{
-            //    individual.UpdateFitness(_fitnessFunction);
-            //}
-
-            // Parallel
-            Parallel.ForEach(_population, individual =>
+            foreach (var individual in _population)
             {
                 individual.UpdateFitness(_fitnessFunction);
-            });
+            }
+
+            // Parallel
+            //Parallel.ForEach(_population, individual =>
+            //{
+            //    individual.UpdateFitness(_fitnessFunction);
+            //});
 
         }
 

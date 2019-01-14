@@ -29,7 +29,7 @@ namespace GA.Implementations
             //StopwatchProvider.StartStopWatch();
             var randomNumbers = individual
                 .Chromosome.Genes
-                .Select(x => random.NextDoubleLock())
+                .Select(x => random.NextDouble())
                 .ToArray();
             //Console.WriteLine(StopwatchProvider.StopWatchTime());
 
@@ -45,7 +45,7 @@ namespace GA.Implementations
             double[] randomNumbers = new double[individual.Chromosome.Genes.Length];
             for (int i = 0; i < individual.Chromosome.Genes.Length; i++)
             {
-                randomNumbers[i] = random.NextDoubleLock();
+                randomNumbers[i] = random.NextDouble();
             }
             //Console.WriteLine(StopwatchProvider.StopWatchTime());
 
