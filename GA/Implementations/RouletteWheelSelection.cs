@@ -60,30 +60,30 @@ namespace GA.Implementations
 
         public List<double> CalculateDistribuance(Individual[] currentPopulation)
         {
-            //var sumOfFitness = currentPopulation
-            //    .Sum(x => x.Fitness);
+            var sumOfFitness2 = currentPopulation
+                .Sum(x => x.Fitness);
 
             double sumOfFitness = 0;
 
-            int seed = 10000;
+            double seed = 10000;
             double tasks = (currentPopulation.Length / seed);
             int amountOfTask = (int)Math.Ceiling(tasks);
             Task<double>[] t = new Task<double>[amountOfTask];
             int LeftC = 0;
-            int RightC = seed;
+            int RightC = (int)seed;
 
             for (int k = 0; k < amountOfTask; k++)
             {
                 if (k == amountOfTask - 1)
                 {
-                    RightC = currentPopulation.Length - 1;
+                    RightC = currentPopulation.Length;
                     t[k] = SumOfFitness(LeftC, RightC, currentPopulation);
                 }
                 else
                 {
                     t[k] = SumOfFitness(LeftC, RightC, currentPopulation);
                     LeftC = RightC;
-                    RightC += seed;
+                    RightC += (int)seed;
                 }
             }
 
@@ -93,42 +93,16 @@ namespace GA.Implementations
                 sumOfFitness += t[k].Result;
             }
 
-            double cummulativeFitness = 0;
-            List<double> distribuance2 = currentPopulation
-                .Select(x =>
-                {
-                    cummulativeFitness += x.Fitness / sumOfFitness;
-                    return cummulativeFitness;
-                })
-                .ToList();
-
-            List<double> distribuance = new List<double>();
-
-            //Task<double[]>[] t2 = new Task<double[]>[amountOfTask];
-            //LeftC = 0;
-            //RightC = seed;
-
-            //for (int k = 0; k < amountOfTask; k++)
-            //{
-            //    if (k == amountOfTask - 1)
+            //double cummulativeFitness = 0;
+            //List<double> distribuance2 = currentPopulation
+            //    .Select(x =>
             //    {
-            //        RightC = currentPopulation.Length - 1;
-            //        t2[k] = SumDivideOfFitness(LeftC, RightC, currentPopulation, sumOfFitness);
-            //    }
-            //    else
-            //    {
-            //        t2[k] = SumDivideOfFitness(LeftC, RightC, currentPopulation, sumOfFitness);
-            //        LeftC = RightC;
-            //        RightC += seed;
-            //    }
-            //}
+            //        cummulativeFitness += x.Fitness / sumOfFitness;
+            //        return cummulativeFitness;
+            //    })
+            //    .ToList();
 
-            //for (int k = 0; k < amountOfTask; k++)
-            //{
-            //    t[k].Wait();
-            //    double[] tmp = t2[k].Result;
-            //    distribuance.AddRange(tmp);
-            //}
+            List<double> distribuance = new List<double>(); 
 
             double sum = 0;
             for (int i = 0; i < currentPopulation.Length; i++)

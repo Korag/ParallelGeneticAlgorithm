@@ -87,6 +87,11 @@ namespace GA
                     {
                         _crossOperator.Crossover(parents[j], parents[j + 1]);
                         _mutationOperator.Mutation(parents[j], MutationProbability);
+
+                        if (j == _numberOfIndividuals - 2)
+                        {
+                            _mutationOperator.Mutation(parents[j+1], MutationProbability);
+                        }
                     }
                 });
 
@@ -106,11 +111,12 @@ namespace GA
             //{
             //    var parents = _selectionOperator.GenerateParentPopulation(_population);
 
-            //    double tasks = (_population.Length / 10000);
+            //    double seed = 10000;
+            //    double tasks = (_population.Length / seed);
             //    int amountOfTask = (int)Math.Ceiling(tasks);
             //    Task[] t = new Task[amountOfTask];
             //    int LeftC = 0;
-            //    int RightC = 10000;
+            //    int RightC = (int)seed;
 
             //    for (int k = 0; k < amountOfTask; k++)
             //    {
@@ -123,7 +129,7 @@ namespace GA
             //        {
             //            t[k] = GeneticOperations(LeftC, RightC, parents);
             //            LeftC = RightC;
-            //            RightC += 10000;
+            //            RightC += (int)seed;
             //        }
             //    }
 
@@ -155,9 +161,8 @@ namespace GA
                     if (_random.NextDouble() < CrossoverProbability)
                     {
                         _crossOperator.Crossover(parents[j], parents[j + 1]);
-
                         _mutationOperator.Mutation(parents[j], MutationProbability);
-                        _mutationOperator.Mutation(parents[j + 1], MutationProbability);
+                        //_mutationOperator.Mutation(parents[j + 1], MutationProbability);
                     }
                 }
             });

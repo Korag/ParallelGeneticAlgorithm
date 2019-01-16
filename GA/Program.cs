@@ -15,7 +15,7 @@ namespace GA
         static void Main(string[] args)
         {
             Func<double, double> fitness = x => 2 * x + 1;
-            var ga = new GeneticAlgorithm(100000, 10,
+            var ga = new GeneticAlgorithm(3000, 10,
                 new OnePointCrossover(),
                 new ClassicMutationOperator(),
                 new RouletteWheelSelection(),
